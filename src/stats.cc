@@ -1,88 +1,57 @@
 #include <twothreetree/twothreetree.h>
 #include <vector>
-#include <stdexcept>
 #include <iostream>
 #include <chrono>
-#include <iomanip>
+#include <numeric> 
 
 
 using namespace std;
 
-
-size_t lcg(size_t& i) {
-    return (i * 1021 + 24631) % 116640;
-}
-
-
 int main() {
+    std::srand(std::time(0)); // Инициализация генератора случайных чисел
+    int count = 10; // Количество случайных значений для вставки
+    int min_value = -10000; // Минимальное случайное значение
+    int max_value = 10000; // Максимальное случайное значение
+    int num_runs = 100; // Количество запусков для вычисления среднего времени
 
- /*
-        Binary_tree set10000;
+    std::vector<double> insertion_times(num_runs); // Вектор для хранения времен вставки
+    std::vector<double> search_times(num_runs); // Вектор для хранения времен удаления
 
+    // Повторяем num_runs раз
+    for (int i = 0; i < num_runs; ++i) {
+        Two3Tree<int> tree;
+        std::vector<int> values(count);
 
-        auto begin = std::chrono::steady_clock::now();
-        for (size_t j = 0; j < 100; j++)
-            for (size_t i = 0; i < 10000; i++)
-                set10000.insert(lcg(i));
-        auto end = std::chrono::steady_clock::now();
+        // Генерируем случайные значения
+        for (int j = 0; j < count; ++j) {
+            values[j] = min_value + std::rand() % (max_value - min_value + 1);
+        }
 
-        auto insert_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-        std::cout << "Avg time for insert 10 000: " << std::fixed << std::setprecision(5) << static_cast<double>(insert_time.count()) / 100 << " ms\n";
-        begin = std::chrono::steady_clock::now();
-        for (size_t j = 0; j < 100; j++)
-            for (size_t i = 0; i < 10000; i++) {
-                set10000.insert(lcg(i));
-                set10000.contains(lcg(i));
-            }
-        end = std::chrono::steady_clock::now();
-        auto contains_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin) - insert_time;
-        std::cout << "Avg time for search 10 000: " << std::fixed << std::setprecision(5) << static_cast<double>(contains_time.count()) / 100 << " ms\n";
+        // Засекаем время вставки
+        auto start_insertion = std::chrono::steady_clock::now();
+        for (const auto& value : values) {
+            tree.insert(value);
+        }
+        auto end_insertion = std::chrono::steady_clock::now();
+        insertion_times[i] = std::chrono::duration<double, std::milli>(end_insertion - start_insertion).count();
 
-        begin = std::chrono::steady_clock::now();
-        for (size_t j = 0; j < 100; j++)
-            for (size_t i = 0; i < 10000; i++) {
-                set10000.insert(lcg(i));
-                set10000.erase(lcg(i));
-            }
-        end = std::chrono::steady_clock::now();
-        auto erase_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin) - insert_time;
-        std::cout << "Avg time for erase 10 000: " << std::fixed << std::setprecision(5) << static_cast<double>(erase_time.count()) / 100 << " ms\n";
+        // Засекаем время поиска
+        auto start_search = std::chrono::steady_clock::now();
+        tree.search_random_values(values);
+        auto end_search = std::chrono::steady_clock::now();
+        search_times[i] = std::chrono::duration<double, std::milli>(end_search - start_search).count();
+    }
 
-*/
+    double average_insertion_time = std::accumulate(insertion_times.begin(), insertion_times.end(), 0.0) / num_runs;
+    double average_search_time = std::accumulate(search_times.begin(), search_times.end(), 0.0) / num_runs;
 
+    std::cout << "Average time taken to insert " << count << " values for " << num_runs << " runs: "
+        << average_insertion_time << " ms" << std::endl;
 
-        vector<int> v1000, v10000, v100000;
+    std::cout << "Average time taken to search " << count << " values for " << num_runs << " runs: "
+        << average_search_time << " ms" << std::endl;
 
-        auto begin = std::chrono::steady_clock::now();
-        for (size_t j = 0; j < 100; j++)
-            for (size_t i = 0; i < 1000; i++)
-                v1000.erase(std::remove(v1000.begin(), v1000.end(), lcg(i)), v1000.end());
-        auto end = std::chrono::steady_clock::now();
-
-        auto insert_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-
-        std::cout << "Avg time for find 1 000: " << std::fixed << std::setprecision(5) << static_cast<double>(insert_time.count()) / 100 << " ms\n";
-
-         begin = std::chrono::steady_clock::now();
-        for (size_t j = 0; j < 100; j++)
-            for (size_t i = 0; i < 10000; i++)
-                v1000.erase(std::remove(v1000.begin(), v1000.end(), lcg(i)), v1000.end());
-         end = std::chrono::steady_clock::now();
-
-         insert_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-
-        std::cout << "Avg time for find 10 000: " << std::fixed << std::setprecision(5) << static_cast<double>(insert_time.count()) / 100 << " ms\n";
-
-        begin = std::chrono::steady_clock::now();
-        for (size_t j = 0; j < 100; j++)
-            for (size_t i = 0; i < 100000; i++)
-                v1000.erase(std::remove(v1000.begin(), v1000.end(), lcg(i)), v1000.end());
-        end = std::chrono::steady_clock::now();
-
-        insert_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-
-        std::cout << "Avg time for find 100 000: " << std::fixed << std::setprecision(5) << static_cast<double>(insert_time.count()) / 100 << " ms\n";
-
+    return 0;
 }
 
 

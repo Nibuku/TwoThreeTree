@@ -24,7 +24,7 @@ TEST(Two3Tree, print_test) {
     tree.insert(12); 
     tree.insert(-1);
     tree.insert(-7);
-    tree.print();
+        tree.print();
 }
 
 TEST(Two3Tree, search_test) {
@@ -52,3 +52,5 @@ TEST(Two3Tree, remove_test) {
     tree.remove(-7);
     tree.print();
 }
+
+
