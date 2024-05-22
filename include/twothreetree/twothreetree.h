@@ -231,9 +231,26 @@ private:
             return search(node->right, key);
     }
 
+    void clear(TwoThreeNode*& node) {
+        if (node) {
+            if (node->left)
+                clear(node->left);
+            if (node->middle)
+                clear(node->middle);
+            if (node->right)
+                clear(node->right);
+            delete node;
+            node = nullptr;
+        }
+    }
 
     public:
         Two3Tree() : _root(nullptr) {}
+
+       ~Two3Tree() {
+            clear(_root);
+            _root = nullptr;
+        }
 
         void insert(const T& key) {
             T new_key;
